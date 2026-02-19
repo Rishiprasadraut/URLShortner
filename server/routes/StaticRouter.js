@@ -19,13 +19,6 @@ router.get("/admin/urls", restrictTo(["ADMIN"]), async (req, res) => {
 router.get("/", restrictTo(["ADMIN", "NORMAL"]), async (req, res) => {
     try {
         const allurls = await URL.find({ createdBy: req.user._id });
-        
-        // Check if request expects JSON (from React app)
-        if (req.headers.accept && req.headers.accept.includes('application/json')) {
-            return res.json({ urls: allurls });
-        }
-        
-        // Otherwise render EJS view
         return res.render("home", {
             urls: allurls,
         });

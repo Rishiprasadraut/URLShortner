@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const { connectDB } = require('./connect');
 const {checkForAuth,
     restrictTo} = require("./middlewares/auth")
@@ -22,10 +21,6 @@ connectDB('mongodb://localhost:27017/url-shortner')
 app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"));
 
-app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

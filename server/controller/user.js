@@ -11,23 +11,24 @@ async function handleUserSignup(req, res) {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: "Email already in use." });
+            return res.render("signup", {
+                error: "Email already in use."
+            });
         }
 
         // Create new user
-        const user = await User.create({
+        await User.create({
             name,
             email,
             password // Password will be hashed by the pre-save hook
         });
 
-        // Generate a token and set as cookie
-        const token = setUser(user);
-        res.cookie("token", token, { httpOnly: true, sameSite: 'lax' });
-        return res.status(201).json({ success: true, token, user: { name: user.name, email: user.email } });
+        return res.redirect("/");
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Something went wrong. Please try again." });
+        return res.render("signup", {
+            error: "Something went wrong. Please try again."
+        });
     }
 }
 
@@ -43,7 +44,9 @@ async function handleUserLogin(req, res) {
         console.log("User found:", user); // Log the user object
 
         if (!user) {
-            return res.status(400).json({ error: "Invalid email or password" });
+            return res.render("login", {
+                error: "Invalid email or password"
+            });
         }
 
         // Compare password
@@ -51,16 +54,20 @@ async function handleUserLogin(req, res) {
         console.log("Password match:", isMatch); // Log the result of password comparison
 
         if (!isMatch) {
-            return res.status(400).json({ error: "Invalid email or password" });
+            return res.render("login", {
+                error: "Invalid email or password"
+            });
         }
 
         // Generate a token and set as cookie
         const token = setUser(user);
-        res.cookie("token", token, { httpOnly: true, sameSite: 'lax' });
-        return res.json({ success: true, token, user: { name: user.name, email: user.email } });
+        res.cookie("token", token, { httpOnly: true });
+        return res.redirect("/");
     } catch (error) {
         console.error("Login error:", error); // Log any errors
-        return res.status(500).json({ error: "Something went wrong. Please try again." });
+        return res.render("login", {
+            error: "Something went wrong. Please try again."
+        });
     }
 }
 
